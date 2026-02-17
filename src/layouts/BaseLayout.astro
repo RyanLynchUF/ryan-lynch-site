@@ -1,0 +1,279 @@
+---
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Ryan Lynch — Software Engineer, Builder, Learner" } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, "https://ryanlynch.me");
+---
+
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+
+    <!-- Display font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap" rel="stylesheet" />
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="128x128" href="/favicon-128x128.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/favicon-192x192.png" />
+
+    <!-- RSS -->
+    <link rel="alternate" type="application/rss+xml" title="Ryan Lynch" href="/rss.xml" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL.href} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    <!-- Theme detection: runs before paint to prevent flash -->
+    <script is:inline>
+      (function () {
+        const stored = localStorage.getItem("theme");
+        const preferred = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        const theme = stored || preferred;
+        document.documentElement.setAttribute("data-theme", theme);
+      })();
+    </script>
+  </head>
+  <body>
+    <Header />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
+
+<style is:global>
+  /* ===== Design Tokens — Light Theme ===== */
+  :root,
+  [data-theme="light"] {
+    --color-bg: #faf9f7;
+    --color-surface: #ffffff;
+    --color-text: #1c1917;
+    --color-text-secondary: #57534e;
+    --color-muted: #78716c;
+    --color-border: #e7e5e4;
+
+    --color-accent: #2563eb;
+    --color-accent-hover: #1d4ed8;
+    --color-accent-secondary: #7c3aed;
+    --color-accent-warm: #ea580c;
+
+    --color-code-bg: #f5f5f4;
+    --color-code-block-bg: #1c1917;
+    --color-code-block-text: #d6d3d1;
+
+    --color-table-header-bg: #f5f5f4;
+
+    --color-callout-bg: #eff6ff;
+    --color-callout-border: #3b82f6;
+    --color-callout-warning-bg: #fffbeb;
+    --color-callout-warning-border: #f59e0b;
+
+    --color-tag-bg: #ede9fe;
+    --color-tag-text: #6d28d9;
+
+    --max-width: 720px;
+  }
+
+  /* ===== Design Tokens — Dark Theme ===== */
+  [data-theme="dark"] {
+    --color-bg: #1c1917;
+    --color-surface: #292524;
+    --color-text: #e7e5e4;
+    --color-text-secondary: #a8a29e;
+    --color-muted: #a8a29e;
+    --color-border: #44403c;
+
+    --color-accent: #60a5fa;
+    --color-accent-hover: #93c5fd;
+    --color-accent-secondary: #a78bfa;
+    --color-accent-warm: #fb923c;
+
+    --color-code-bg: #292524;
+    --color-code-block-bg: #0c0a09;
+    --color-code-block-text: #d6d3d1;
+
+    --color-table-header-bg: #292524;
+
+    --color-callout-bg: #1e293b;
+    --color-callout-border: #60a5fa;
+    --color-callout-warning-bg: #451a03;
+    --color-callout-warning-border: #fbbf24;
+
+    --color-tag-bg: #2d2244;
+    --color-tag-text: #c4b5fd;
+  }
+
+  /* ===== Reset ===== */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  /* ===== Base ===== */
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--color-text);
+    background: var(--color-bg);
+    line-height: 1.7;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  /* ===== Main ===== */
+  main {
+    flex: 1;
+    max-width: var(--max-width);
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 1rem 3rem;
+  }
+
+  /* ===== Links ===== */
+  a {
+    color: var(--color-accent);
+  }
+
+  /* ===== Images ===== */
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+  }
+
+  /* ===== Article / Prose ===== */
+  article h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+
+  article h2 {
+    font-size: 1.5rem;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  article h3 {
+    font-size: 1.25rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  article p {
+    margin-bottom: 1rem;
+  }
+
+  article ul, article ol {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+  }
+
+  article li {
+    margin-bottom: 0.25rem;
+  }
+
+  article blockquote {
+    border-left: 3px solid var(--color-border);
+    padding-left: 1rem;
+    color: var(--color-muted);
+    margin-bottom: 1rem;
+  }
+
+  article pre {
+    background: var(--color-code-block-bg);
+    color: var(--color-code-block-text);
+    padding: 1rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+
+  article code {
+    font-family: "SF Mono", "Fira Code", monospace;
+    font-size: 0.9em;
+  }
+
+  article :not(pre) > code {
+    background: var(--color-code-bg);
+    padding: 0.15rem 0.35rem;
+    border-radius: 3px;
+  }
+
+  article figure {
+    margin-bottom: 1rem;
+  }
+
+  article figcaption {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    text-align: center;
+    margin-top: 0.25rem;
+  }
+
+  /* ===== Tables ===== */
+  article table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+
+  article th, article td {
+    border: 1px solid var(--color-border);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+
+  article th {
+    background: var(--color-table-header-bg);
+    font-weight: 600;
+  }
+
+  /* ===== Callouts ===== */
+  .callout {
+    border-left: 4px solid var(--color-callout-border);
+    background: var(--color-callout-bg);
+    padding: 0.75rem 1rem;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 1rem;
+  }
+
+  .callout[data-callout="warning"] {
+    border-left-color: var(--color-callout-warning-border);
+    background: var(--color-callout-warning-bg);
+  }
+
+  .callout[data-callout="info"] {
+    border-left-color: var(--color-callout-border);
+    background: var(--color-callout-bg);
+  }
+
+  /* ===== Strikethrough ===== */
+  del {
+    color: var(--color-muted);
+  }
+</style>

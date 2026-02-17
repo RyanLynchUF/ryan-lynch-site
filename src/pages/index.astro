@@ -1,0 +1,463 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+const allPosts = (await getCollection("posts", ({ data }) => data.published))
+  .sort((a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0));
+
+const featuredPost = allPosts[0];
+const recentPosts = allPosts.slice(1, 5);
+---
+
+<BaseLayout title="Ryan Lynch">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-header">
+      <div class="hero-header-text">
+        <h1>Ryan Lynch</h1>
+        <p class="tagline">Systematic thinker. Pragmatic builder. Optimistic explorer.</p>
+      </div>
+      <div class="hero-photo">
+        <img src="/profile.png" alt="Ryan Lynch" width="192" height="192" />
+      </div>
+    </div>
+    <div class="intro">
+      <p>
+        I like to build things, learn things, and write about both.
+      </p>
+      <p>
+        Professionally, I'm a software engineering leader who thinks a lot about AI and
+        data. Specifically, how to put them to practical use at scale.
+      </p>
+      <p>
+        Personally, I'm a husband, parent, curator, and obsessive learner. I keep a
+        <a href="https://brain.ryanlynch.me">second brain</a> in Obsidian
+        where I collect everything I'm learning, and the best of it ends up
+        here or in my <a href="#newsletter">newsletter</a>. Architecture
+        notes sit next to home automations, data strategy next to golf
+        analysis. Everything starts in my Obsidian vault, and when
+        something clicks, it shows up here. Sign-up and let's learn together.
+      </p>
+      <p>
+        <a href="/about">More about me &rarr;</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- Now -->
+  <section class="now-strip">
+    <div class="now-header">
+      <span class="now-dot" aria-hidden="true"></span>
+      <span class="now-label">Now</span>
+      <a href="/now" class="now-link">See all &rarr;</a>
+    </div>
+    <p class="now-body">
+      On a career break raising my son. Building this site from my Obsidian
+      vault. Tinkering with Home Assistant. Working on my short game.
+    </p>
+  </section>
+
+  <!-- Recent Writing -->
+  <section class="recent-posts">
+    <div class="section-header">
+      <h2>Recent Writing</h2>
+      <a href="/blog" class="view-all">All posts &rarr;</a>
+    </div>
+
+    {featuredPost && (
+      <a href={`/blog/${featuredPost.data.slug}`} class="featured">
+        <div class="featured-meta">
+          {featuredPost.data.date && (
+            <time datetime={featuredPost.data.date.toISOString()}>
+              {featuredPost.data.date.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+            </time>
+          )}
+          {featuredPost.data.tags && featuredPost.data.tags.length > 0 && (
+            <span class="featured-tags">
+              {featuredPost.data.tags.map((tag: string) => (
+                <span class="tag">{tag}</span>
+              ))}
+            </span>
+          )}
+        </div>
+        <h3>{featuredPost.data.title}</h3>
+        {featuredPost.data.description && (
+          <p>{featuredPost.data.description}</p>
+        )}
+      </a>
+    )}
+
+    <div class="post-list">
+      {recentPosts.map((post) => (
+        <a href={`/blog/${post.data.slug}`} class="post-row">
+          <span class="post-title">{post.data.title}</span>
+          {post.data.date && (
+            <time datetime={post.data.date.toISOString()}>
+              {post.data.date.toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              })}
+            </time>
+          )}
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <div class="page-end">
+    <a href="/meta">Curious how this site is built?</a>
+  </div>
+</BaseLayout>
+
+<style>
+  /* ===== Hero ===== */
+  .hero {
+    padding: 3.5rem 0 2.5rem;
+  }
+
+  .hero-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-header-text {
+    flex: 1;
+  }
+
+  .hero h1 {
+    font-family: "DM Serif Display", Georgia, serif;
+    font-size: 3rem;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 0.5rem;
+  }
+
+  .tagline {
+    font-size: 1.05rem;
+    color: var(--color-muted);
+    position: relative;
+    padding-bottom: 1.25rem;
+  }
+
+  .tagline::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 5rem;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--color-accent-warm);
+    transform-origin: left;
+    animation: draw-in 0.6s ease-out 0.3s both;
+  }
+
+  @keyframes draw-in {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  .intro p {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.75rem;
+  }
+
+  .intro p:last-child {
+    margin-bottom: 0;
+  }
+
+  .intro a {
+    color: var(--color-accent);
+    text-decoration-color: var(--color-border);
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.2s ease;
+  }
+
+  .intro a:hover {
+    text-decoration-color: var(--color-accent);
+  }
+
+  /* ===== Profile Photo ===== */
+  .hero-photo {
+    flex-shrink: 0;
+    opacity: 0;
+    animation: fade-in 0.8s ease 0.3s both;
+  }
+
+  .hero-photo img {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--color-border);
+    transition: border-color 0.3s ease;
+  }
+
+  .hero-photo img:hover {
+    border-color: var(--color-accent-warm);
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* ===== Now Strip ===== */
+  .now-strip {
+    padding: 1rem 1.25rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    margin-bottom: 2.5rem;
+  }
+
+  .now-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .now-dot {
+    width: 7px;
+    height: 7px;
+    background: #22c55e;
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.35;
+    }
+  }
+
+  .now-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text);
+    flex-grow: 1;
+  }
+
+  .now-link {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .now-link:hover {
+    color: var(--color-accent);
+  }
+
+  .now-body {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+  }
+
+  /* ===== Recent Posts ===== */
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 0.25rem;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 0.75rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .view-all {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .view-all:hover {
+    color: var(--color-accent);
+  }
+
+  /* ===== Featured Post ===== */
+  .featured {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    padding: 1.25rem 0 1.25rem 1.25rem;
+    border-left: 3px solid var(--color-accent-warm);
+    margin: 1.25rem 0;
+    transition: border-color 0.2s ease;
+  }
+
+  .featured:hover {
+    border-color: var(--color-accent);
+  }
+
+  .featured-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.35rem;
+    flex-wrap: wrap;
+  }
+
+  .featured-meta time {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+  }
+
+  .featured-tags {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  .tag {
+    font-family: "SF Mono", "Fira Code", monospace;
+    font-size: 0.7rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    background: var(--color-tag-bg);
+    color: var(--color-tag-text);
+  }
+
+  .featured h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1.35;
+    margin-bottom: 0.3rem;
+    transition: color 0.15s ease;
+  }
+
+  .featured:hover h3 {
+    color: var(--color-accent);
+  }
+
+  .featured p {
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--color-text-secondary);
+  }
+
+  /* ===== Compact Post List ===== */
+  .post-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .post-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--color-border);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .post-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: color 0.15s ease;
+  }
+
+  .post-row:hover .post-title {
+    color: var(--color-accent);
+  }
+
+  .post-row time {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* ===== Page End ===== */
+  .page-end {
+    padding-top: 3rem;
+    padding-bottom: 1rem;
+    text-align: center;
+  }
+
+  .page-end a {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .page-end a:hover {
+    color: var(--color-text-secondary);
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 640px) {
+    .hero {
+      padding: 2.5rem 0 2rem;
+    }
+
+    .hero-header {
+      flex-direction: column-reverse;
+      text-align: center;
+    }
+
+    .hero-photo img {
+      width: 110px;
+      height: 110px;
+    }
+
+    .tagline::after {
+      left: 50%;
+      transform-origin: center;
+      transform: translateX(-50%) scaleX(0);
+      animation: draw-in-center 0.6s ease-out 0.3s both;
+    }
+
+    .hero h1 {
+      font-size: 2.5rem;
+    }
+
+    .section-header {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+  }
+
+  @keyframes draw-in-center {
+    from {
+      transform: translateX(-50%) scaleX(0);
+    }
+    to {
+      transform: translateX(-50%) scaleX(1);
+    }
+  }
+</style>

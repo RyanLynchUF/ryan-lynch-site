@@ -1,0 +1,25 @@
+{
+  "name": "ryan-lynch",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "astro dev",
+    "predev": "node scripts/copy-media.mjs",
+    "dev": "astro dev",
+    "prebuild": "node scripts/copy-media.mjs",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.29.3",
+  "dependencies": {
+    "@r4ai/remark-callout": "^0.6.2",
+    "astro": "^5.17.2",
+    "remark-gfm": "^4.0.1",
+    "unist-util-visit": "^5.1.0"
+  }
+}
