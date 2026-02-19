@@ -15,11 +15,14 @@ export default function remarkStripObsidianComments() {
 
     // Also handle cases where %% content spans paragraph nodes
     visit(tree, "paragraph", (node, index, parent) => {
-      // After stripping, remove empty paragraphs
-      const textContent = node.children
-        ?.map((c) => c.value || "")
-        .join("")
-        .trim();
+      // After stripping, remove empty paragraphs.
+      // Recurse into children so link/emphasis/etc nodes aren't treated as empty.
+      function extractText(n) {
+        if (n.value !== undefined) return n.value;
+        if (n.children) return n.children.map(extractText).join("");
+        return "";
+      }
+      const textContent = extractText(node).trim();
       if (textContent === "") {
         parent.children.splice(index, 1);
         return index; // revisit this index since we removed a node

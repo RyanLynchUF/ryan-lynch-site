@@ -22,6 +22,7 @@ const blogSlugMap = {
 };
 
 export default defineConfig({
+  site: "https://ryanlynch.me",
   output: "static",
   markdown: {
     remarkPlugins: [

@@ -5,9 +5,8 @@ Astro v5 static site that builds a portfolio/blog from an Obsidian vault.
 ## Architecture (Two-Repo Setup)
 
 - **Site repo:** `github.com/RyanLynchUF/ryan-lynch-site` — this repo (Astro code, Dockerfile, etc.)
-- **Vault repo:** `github.com/RyanLynchUF/obsidian-my-hub` — Obsidian vault (private, auto-backed up by Obsidian Git)
-- **Local convention:** vault lives at `~/Documents/MyHub/` (sibling of this repo at `~/Documents/ryan-lynch-site/`)
-- **Vault path:** controlled by `VAULT_PATH` env var, defaults to `../MyHub` relative to project root
+- **Vault repo:** private Obsidian vault, cloned at Docker build time
+- **Vault path:** controlled by `VAULT_PATH` env var (see `.claude/local.md` for local conventions)
 
 - **Astro v5** with Content Layer API — `src/content.config.ts` defines a `posts` collection that globs all `.md` files from the vault
 - **Published posts** are filtered by `published: true` in YAML frontmatter
@@ -16,8 +15,6 @@ Astro v5 static site that builds a portfolio/blog from an Obsidian vault.
 
 ## Key Directories
 
-- `../MyHub/` — Obsidian vault (source of truth, do NOT restructure; lives outside this repo)
-- `../MyHub/_Organization/_Media/` — all images (PNGs, Excalidraw SVGs)
 - `src/plugins/` — custom remark plugins for Obsidian markdown quirks
 - `scripts/copy-media.mjs` — pre-build script that copies only published-post images to `public/media/`
 
@@ -44,16 +41,9 @@ VAULT_PATH=/path/to/vault pnpm run build
 
 ## Docker
 
-Docker clones the vault repo at build time:
-
 ```bash
 docker build -t ryan-lynch-site .
 docker run -p 8080:80 ryan-lynch-site
-```
-
-Override vault repo (e.g. for a fork or private token):
-```bash
-docker build --build-arg VAULT_REPO=https://github.com/RyanLynchUF/obsidian-my-hub.git -t ryan-lynch-site .
 ```
 
 ## Adding a New Blog Post
@@ -69,5 +59,4 @@ docker build --build-arg VAULT_REPO=https://github.com/RyanLynchUF/obsidian-my-h
    published: true
    ---
    ```
-2. Images should be in `MyHub/_Organization/_Media/` (or `_excalidraw/` subdirectory for SVGs)
-3. Run `pnpm run build` to verify
+2. Run `pnpm run build` to verify

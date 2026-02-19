@@ -17,6 +17,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.29.3",
   "dependencies": {
+    "@astrojs/rss": "^4.0.15",
     "@r4ai/remark-callout": "^0.6.2",
     "astro": "^5.17.2",
     "remark-gfm": "^4.0.1",

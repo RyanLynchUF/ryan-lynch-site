@@ -1,0 +1,79 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { render } from "astro:content";
+import { getPage } from "../lib/get-page";
+
+const page = await getPage("now");
+const { Content } = await render(page);
+---
+
+<BaseLayout title="Now — Ryan Lynch" description={page.data.description}>
+  <article class="page-content">
+    <header class="page-header">
+      <h1>{page.data.title}</h1>
+      <p class="page-tagline">
+        {page.data.description}
+        {page.data.lastUpdated && (
+          <span class="page-updated">
+            {"Last Updated: "}
+            <time datetime={page.data.lastUpdated.toISOString()}>
+              {page.data.lastUpdated.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+              })}
+            </time>
+          </span>
+        )}
+      </p>
+    </header>
+    <div class="content">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .page-content {
+    padding-top: 1.5rem;
+  }
+
+  .page-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .page-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+    padding-bottom: 0.6rem;
+    position: relative;
+    display: inline-block;
+  }
+
+  .page-header h1::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 3rem;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--color-accent-warm);
+  }
+
+  .page-tagline {
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-top: 0.1rem;
+    margin-bottom: 0;
+  }
+
+  .page-updated {
+    display: block;
+    color: var(--color-muted);
+    font-size: 0.85rem;
+  }
+</style>

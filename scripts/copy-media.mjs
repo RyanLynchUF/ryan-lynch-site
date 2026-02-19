@@ -1,6 +1,6 @@
 /**
  * Pre-build script: copies only images referenced by published blog posts
- * from MyHub/_Organization/_Media/ into public/media/.
+ * and _website pages from MyHub/_Organization/_Media/ into public/media/.
  *
  * Safety: only wipes public/media/ if a .generated marker exists (or dir doesn't exist).
  */
@@ -21,7 +21,7 @@ const IMAGE_EXTS = new Set([".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp"]);
 // Regex to extract wiki-image references: ![[filename.ext]] or ![[filename.ext | ...]]
 const WIKI_IMAGE_RE = /!\[\[([^\]|]+?)(?:\s*\|[^\]]*?)?\]\]/g;
 
-// ── 1. Find published posts and extract image references ──
+// ── 1. Find published posts and website pages, extract image references ──
 
 function getPublishedPosts() {
   const posts = [];
@@ -36,6 +36,19 @@ function getPublishedPosts() {
     }
   });
   return posts;
+}
+
+function getWebsitePages() {
+  const websiteDir = path.join(VAULT, "_website");
+  const pages = [];
+  if (!fs.existsSync(websiteDir)) return pages;
+  for (const entry of fs.readdirSync(websiteDir, { withFileTypes: true })) {
+    if (!entry.isFile() || !entry.name.endsWith(".md")) continue;
+    const filePath = path.join(websiteDir, entry.name);
+    const content = fs.readFileSync(filePath, "utf-8");
+    pages.push({ filePath, content });
+  }
+  return pages;
 }
 
 function walkDir(dir, callback) {
@@ -97,7 +110,10 @@ function main() {
   const posts = getPublishedPosts();
   console.log(`Found ${posts.length} published posts`);
 
-  const imageRefs = extractImageRefs(posts);
+  const websitePages = getWebsitePages();
+  console.log(`Found ${websitePages.length} website pages`);
+
+  const imageRefs = extractImageRefs([...posts, ...websitePages]);
   console.log(`Found ${imageRefs.size} unique image references`);
 
   const sourceMap = buildSourceMap();

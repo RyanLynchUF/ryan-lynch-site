@@ -272,6 +272,11 @@ const canonicalURL = new URL(Astro.url.pathname, "https://ryanlynch.me");
     background: var(--color-callout-bg);
   }
 
+  /* ===== Inline text ===== */
+  article em, article i {
+    font-style: italic;
+  }
+
   /* ===== Strikethrough ===== */
   del {
     color: var(--color-muted);
