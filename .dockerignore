@@ -3,3 +3,7 @@ dist
 .astro
 .git
 public/media
+.github
+.claude
+.env
+.env.example
