@@ -1,0 +1,7 @@
+name = "ryanlynch-error-worker"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+routes = [
+  { pattern = "ryanlynch.me/*", zone_id = "b130f5d5093aa40e219afd691f4ff5be" }
+]

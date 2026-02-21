@@ -29,18 +29,19 @@ const posts = (await getCollection("posts", ({ data }) => data.published))
 
 <style>
   .blog-page {
-    padding-top: 2rem;
+    padding-top: 1.5rem;
   }
 
   .page-header {
-    margin-bottom: 1.5rem;
-    padding-bottom: 1.25rem;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
     border-bottom: 1px solid var(--color-border);
   }
 
   .page-header h1 {
     font-size: 2rem;
     font-weight: 700;
+    line-height: 1.2;
     margin-bottom: 0.35rem;
     position: relative;
     display: inline-block;

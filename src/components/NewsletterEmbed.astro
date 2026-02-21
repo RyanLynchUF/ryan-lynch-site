@@ -1,20 +1,18 @@
 ---
-// Custom Substack newsletter form — no iframe, fully themeable
+// Custom Kit newsletter form — no iframe, fully themeable
 ---
 
 <div id="newsletter" class="newsletter">
   <p class="newsletter-heading">Stay in the loop</p>
   <p class="newsletter-desc">Occasional updates on what I'm building, learning, and thinking about.</p>
   <form
-    action="https://ryanlynchlog.substack.com/api/v1/free?nojs=true"
+    action="https://app.kit.com/forms/9116459/subscriptions"
     method="POST"
     class="newsletter-form"
   >
-    <input type="hidden" name="first_url" value="https://ryanlynchlog.substack.com" />
-    <input type="hidden" name="first_referrer" value="" />
     <input
       type="email"
-      name="email"
+      name="email_address"
       placeholder="your@email.com"
       required
       autocomplete="email"
