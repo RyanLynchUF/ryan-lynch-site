@@ -254,7 +254,7 @@ const canonicalURL = new URL(Astro.url.pathname, "https://ryanlynch.me");
   }
 
   /* ===== Callouts ===== */
-  .callout {
+  [data-callout] {
     border-left: 4px solid var(--color-callout-border);
     background: var(--color-callout-bg);
     padding: 0.75rem 1rem;
@@ -262,12 +262,47 @@ const canonicalURL = new URL(Astro.url.pathname, "https://ryanlynch.me");
     margin-bottom: 1rem;
   }
 
-  .callout[data-callout="warning"] {
+  [data-callout-title] {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 0.35rem;
+    color: var(--color-text);
+  }
+
+  [data-callout-body] p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Foldable callouts (rendered as <details>) */
+  details[data-callout] > summary {
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    list-style: none;
+    margin-bottom: 0.35rem;
+    color: var(--color-text);
+  }
+
+  details[data-callout] > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  details[data-callout] > summary::before {
+    content: "▶ ";
+    font-size: 0.75rem;
+    margin-right: 0.25rem;
+  }
+
+  details[data-callout][open] > summary::before {
+    content: "▼ ";
+  }
+
+  [data-callout-type="warning"] {
     border-left-color: var(--color-callout-warning-border);
     background: var(--color-callout-warning-bg);
   }
 
-  .callout[data-callout="info"] {
+  [data-callout-type="info"] {
     border-left-color: var(--color-callout-border);
     background: var(--color-callout-bg);
   }

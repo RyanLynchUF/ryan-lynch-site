@@ -6,9 +6,9 @@
   "main": "index.js",
   "scripts": {
     "start": "astro dev",
-    "predev": "node scripts/copy-media.mjs",
+    "predev": "node --env-file-if-exists=.env scripts/copy-media.mjs",
     "dev": "astro dev",
-    "prebuild": "node scripts/copy-media.mjs",
+    "prebuild": "node --env-file-if-exists=.env scripts/copy-media.mjs",
     "build": "astro build",
     "preview": "astro preview"
   },
@@ -22,5 +22,8 @@
     "astro": "^5.17.2",
     "remark-gfm": "^4.0.1",
     "unist-util-visit": "^5.1.0"
+  },
+  "devDependencies": {
+    "vite": "^7.3.1"
   }
 }
