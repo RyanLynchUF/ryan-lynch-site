@@ -1,9 +1,13 @@
 import { defineConfig } from "astro/config";
+import { loadEnv } from "vite";
 import remarkStripObsidianComments from "./src/plugins/remark-strip-obsidian-comments.mjs";
 import remarkObsidianImages from "./src/plugins/remark-obsidian-images.mjs";
 import remarkWikiLinks from "./src/plugins/remark-wiki-links.mjs";
 import remarkCallout from "@r4ai/remark-callout";
 import remarkGfm from "remark-gfm";
+
+const { VAULT_PATH } = loadEnv(import.meta.env.MODE, process.cwd(), "");
+if (VAULT_PATH) process.env.VAULT_PATH = VAULT_PATH;
 
 // Map of note title → blog slug for cross-post links.
 // These resolve to /blog/<slug> instead of brain.ryanlynch.me.
