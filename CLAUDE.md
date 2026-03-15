@@ -53,7 +53,7 @@ Full chain from writing a post to it appearing on the live site:
 1. **Obsidian Git plugin** auto-commits vault changes every 10 minutes and pushes to `ryan-lynch-brain` on GitHub every 12 hours (configurable in `.obsidian/plugins/obsidian-git/data.json`; can also push manually)
 2. **Vault CI** — on push to `main`, `ryan-lynch-brain/.github/workflows/trigger-site-build.yml` sends a `repository_dispatch` (type: `vault-updated`) to this repo using `SITE_REPO_PAT` secret
 3. **Site CI** — `.github/workflows/deploy.yml` triggers on the dispatch (also on pushes to `main` and manual `workflow_dispatch`), builds a Docker image that clones the vault via SSH deploy key, runs the Astro build, and pushes to Docker Hub (`DOCKERHUB_USERNAME/ryan-lynch-site:latest`)
-4. **Server deployment** — a Docker container on a Proxmox LXC (Dell OptiPlex home server) runs the site behind Nginx. Watchtower polls Docker Hub for new images at the default interval (24h) and auto-restarts the container when a new image is found
+4. **Server deployment** — a Docker container on a Proxmox LXC (Dell OptiPlex home server) runs the site behind Nginx. Watchtower polls Docker Hub for new images every 5 minutes (`WATCHTOWER_POLL_INTERVAL=300`) and auto-restarts the container when a new image is found
 
 ### Required GitHub Secrets
 

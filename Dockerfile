@@ -12,6 +12,9 @@ COPY . .
 # Pre-populate GitHub host key so SSH doesn't prompt
 RUN mkdir -p ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
 
+# Bust cache so the vault is always re-cloned on each build
+ARG CACHEBUST=0
+
 # Clone private vault using BuildKit SSH mount (never stored in image layers)
 RUN --mount=type=ssh \
     git clone --depth 1 git@github.com:RyanLynchUF/ryan-lynch-brain.git ../MyHub

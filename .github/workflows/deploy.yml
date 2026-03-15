@@ -38,6 +38,8 @@ jobs:
           context: .
           push: true
           ssh: default
+          build-args: |
+            CACHEBUST=${{ github.run_id }}
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/ryan-lynch-site:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/ryan-lynch-site:${{ github.sha }}
