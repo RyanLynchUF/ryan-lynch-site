@@ -132,7 +132,7 @@ function main() {
       sourceMap.get(path.basename(ref)) ||
       (fs.existsSync(path.join(VAULT, ref)) ? path.join(VAULT, ref) : null);
     if (!srcPath) {
-      console.warn(`  WARN: no source found for "${filename}"`);
+      console.warn(`  WARN: no source found for "${ref}"`);
       missing++;
       continue;
     }
