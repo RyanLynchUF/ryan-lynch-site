@@ -6,7 +6,7 @@
  *   ![[image.png | 300]]     → <img src="/media/image.png" alt="image.png" width="300">
  *   ![[image.png | caption]] → <figure><img ...><figcaption>caption</figcaption></figure>
  *
- * Builds a filename→path lookup by scanning MyHub/_Organization/_Media/ at init.
+ * Builds a filename→path lookup by scanning the vault's 2_Organization/_Media/ at init.
  */
 import { visit } from "unist-util-visit";
 import fs from "node:fs";
@@ -44,7 +44,7 @@ const WIKI_IMAGE_RE = /!\[\[([^\]]+?)\]\]/g;
 
 export default function remarkObsidianImages() {
   const vaultRoot = path.resolve(process.env.VAULT_PATH || "../MyHub");
-  const mediaRoot = path.join(vaultRoot, "_Organization", "_Media");
+  const mediaRoot = path.join(vaultRoot, "2_Organization", "_Media");
   const imageMap = buildImageMap(vaultRoot, mediaRoot);
 
   return (tree) => {

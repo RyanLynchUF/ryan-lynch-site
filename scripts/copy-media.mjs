@@ -1,6 +1,6 @@
 /**
  * Pre-build script: copies only images referenced by published blog posts
- * and _website pages from MyHub/_Organization/_Media/ into public/media/.
+ * and _website pages from the vault's 2_Organization/_Media/ into public/media/.
  *
  * Safety: only wipes public/media/ if a .generated marker exists (or dir doesn't exist).
  */
@@ -11,7 +11,7 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const VAULT = path.resolve(process.env.VAULT_PATH || path.join(ROOT, "..", "MyHub"));
-const MEDIA_SRC = path.join(VAULT, "_Organization", "_Media");
+const MEDIA_SRC = path.join(VAULT, "2_Organization", "_Media");
 const MEDIA_DEST = path.join(ROOT, "public", "media");
 const MARKER = path.join(MEDIA_DEST, ".generated");
 
