@@ -1,0 +1,127 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const tagline = "Insights on what is possible with AI, actually. Written for anyone who cares more about outcomes than hype.";
+---
+
+<BaseLayout title="Newsletter — Ryan Lynch" description={tagline}>
+  <article class="page-content">
+    <header class="page-header">
+      <h1>AI, Actually</h1>
+      <p class="page-tagline">{tagline}</p>
+    </header>
+    <div class="content">
+      <p>
+        AI moves fast, and most of what's written about it is hype, hot
+        takes, or tutorials for engineers. <em>AI, Actually</em> is the
+        read I wished I had: a short weekly roundup of practical, mature
+        AI use cases &mdash; what's actually working, where it's actually being
+        used, and what that means for the rest of us.
+      </p>
+      <p>
+        It's written for anyone who's curious about AI but doesn't want
+        to live in it day-to-day. No jargon, no hot takes &mdash; just a few
+        links worth your time and a short blog post tying them together.
+        Ships Tuesday mornings.
+      </p>
+      <div class="cta-row">
+        <a
+          class="newsletter-btn"
+          href="https://aiactually.beehiiv.com/"
+          target="_blank"
+          rel="noopener"
+        >Subscribe on Beehiiv &rarr;</a>
+        <a
+          class="newsletter-archive"
+          href="https://aiactually.beehiiv.com/"
+          target="_blank"
+          rel="noopener"
+        >Read past issues</a>
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .page-content {
+    padding-top: 1.5rem;
+  }
+
+  .page-header {
+    margin-bottom: 1.25rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .page-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+    padding-bottom: 0.6rem;
+    position: relative;
+    display: inline-block;
+  }
+
+  .page-header h1::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 3rem;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--color-accent-warm);
+  }
+
+  .page-tagline {
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-top: 0.1rem;
+    margin-bottom: 0;
+  }
+
+  .content p {
+    margin-bottom: 1rem;
+    line-height: 1.75;
+    color: var(--color-text-secondary);
+  }
+
+  .cta-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+  }
+
+  .newsletter-btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-family: inherit;
+    font-weight: 500;
+    color: #fff;
+    background: var(--color-accent);
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.2s ease;
+  }
+
+  .newsletter-btn:hover {
+    background: var(--color-accent-hover);
+  }
+
+  .newsletter-archive {
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .newsletter-archive:hover {
+    color: var(--color-accent);
+  }
+</style>
