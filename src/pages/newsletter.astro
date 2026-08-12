@@ -1,43 +1,32 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 
-const tagline = "Insights on what is possible with AI, actually. Written for anyone who cares more about outcomes than hype.";
+const tagline = "What can AI take off your plate? A newsletter for people who want to know what AI can actually do for them.";
 ---
 
 <BaseLayout title="Newsletter — Ryan Lynch" description={tagline}>
   <article class="page-content">
     <header class="page-header">
-      <h1>AI, Actually</h1>
+      <h1>Your Turn, Robot</h1>
       <p class="page-tagline">{tagline}</p>
     </header>
     <div class="content">
       <p>
-        AI moves fast, and most of what's written about it is hype, hot
-        takes, or tutorials for engineers. <em>AI, Actually</em> is the
-        read I wished I had: a short weekly roundup of practical, mature
-        AI use cases &mdash; what's actually working, where it's actually being
-        used, and what that means for the rest of us.
+        Each issue of <em>Your Turn, Robot</em> is the AI section of my
+        notes, cleaned up. Tools I've started using, write-ups that
+        changed how I think. All stuff I've personally gotten real
+        value from.
       </p>
-      <p>
-        It's written for anyone who's curious about AI but doesn't want
-        to live in it day-to-day. No jargon, no hot takes &mdash; just a few
-        links worth your time and a short blog post tying them together.
-        Ships Tuesday mornings.
-      </p>
-      <div class="cta-row">
+      <p>AI I know works, because I've used it.</p>
+      <p>Ships Tuesday mornings.</p>
+      <p class="subscribe-note">
+        Subscribe below to get it in your inbox &mdash; or
         <a
-          class="newsletter-btn"
           href="https://aiactually.beehiiv.com/"
           target="_blank"
           rel="noopener"
-        >Subscribe on Beehiiv &rarr;</a>
-        <a
-          class="newsletter-archive"
-          href="https://aiactually.beehiiv.com/"
-          target="_blank"
-          rel="noopener"
-        >Read past issues</a>
-      </div>
+        >read past issues</a>.
+      </p>
     </div>
   </article>
 </BaseLayout>
@@ -87,41 +76,20 @@ const tagline = "Insights on what is possible with AI, actually. Written for any
     color: var(--color-text-secondary);
   }
 
-  .cta-row {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
+  .subscribe-note {
     margin-top: 1.5rem;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
   }
 
-  .newsletter-btn {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-    font-family: inherit;
-    font-weight: 500;
-    color: #fff;
-    background: var(--color-accent);
-    border: none;
-    border-radius: 6px;
-    text-decoration: none;
-    white-space: nowrap;
-    transition: background 0.2s ease;
-  }
-
-  .newsletter-btn:hover {
-    background: var(--color-accent-hover);
-  }
-
-  .newsletter-archive {
-    font-size: 0.9rem;
-    color: var(--color-muted);
+  .subscribe-note a {
+    color: var(--color-accent);
     text-decoration: none;
     transition: color 0.2s ease;
   }
 
-  .newsletter-archive:hover {
-    color: var(--color-accent);
+  .subscribe-note a:hover {
+    color: var(--color-accent-hover);
   }
 </style>
