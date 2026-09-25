@@ -1,0 +1,183 @@
+---
+// WritingFilter: All / Blog / Newsletter segmented control.
+//
+// mode "groups": the target container holds [data-group="all|blog|newsletter"]
+//   panels; the active filter shows one and hides the others.
+// mode "rows": the target container holds [data-kind="blog|newsletter"] items;
+//   "All" shows everything, a kind hides non-matching items. If that leaves
+//   nothing visible, the container's [data-empty="<filter>"] note is shown,
+//   since the server rendered a list that is not empty. Groups mode needs no
+//   such thing: each panel renders its own empty note.
+//
+// An optional element with data-filter-link="<target>" gets its href set to
+// /blog, /blog?kind=blog or /blog?kind=newsletter to match the active filter.
+//
+// On load, the ?kind=blog or ?kind=newsletter query parameter preselects
+// that filter. A query parameter, not a hash, because the footer's
+// #newsletter anchor is the site's subscribe link.
+// Nothing is persisted and clicking does not touch history.
+//
+// Without JavaScript the control is hidden by a <noscript> style. The
+// <noscript> sits inside the control, not after it: with scripting off it
+// renders as a box, and as a sibling it became an empty flex item in the
+// caller's layout (on /blog, a 16px gap and, on a phone, an empty row).
+
+interface Props {
+  mode: "groups" | "rows";
+  target: string;
+}
+
+const { mode, target } = Astro.props;
+
+const options = [
+  { value: "all", label: "All" },
+  { value: "blog", label: "Blog" },
+  { value: "newsletter", label: "Newsletter" },
+] as const;
+---
+
+<div
+  class="writing-filter"
+  role="group"
+  aria-label="Filter writing by kind"
+  data-mode={mode}
+  data-target={target}
+>
+  {options.map((option) => (
+    <button
+      type="button"
+      data-filter={option.value}
+      aria-pressed={option.value === "all" ? "true" : "false"}
+    >
+      {option.label}
+    </button>
+  ))}
+  <noscript><style is:inline>.writing-filter{display:none !important}</style></noscript>
+</div>
+
+<style>
+  .writing-filter {
+    display: inline-flex;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 2px;
+    background: var(--color-surface);
+  }
+
+  .writing-filter button {
+    font: inherit;
+    line-height: 1.7;
+    font-size: 0.78rem;
+    font-weight: 500;
+    padding: 0.2rem 0.7rem;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--color-muted);
+    cursor: pointer;
+    transition:
+      background 0.15s ease,
+      color 0.15s ease;
+  }
+
+  .writing-filter button:hover {
+    color: var(--color-text);
+  }
+
+  .writing-filter button[aria-pressed="true"] {
+    background: var(--color-text);
+    color: var(--color-bg);
+  }
+
+  .writing-filter button:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 1px;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (forced-colors: active) {
+    .writing-filter button[aria-pressed="true"] {
+      forced-color-adjust: none;
+      background: Highlight;
+      color: HighlightText;
+    }
+
+    .writing-filter button[aria-pressed="true"]:focus-visible {
+      outline-color: CanvasText;
+    }
+  }
+
+  /* Everything this control hides carries [hidden], so nothing here may be
+     revived by a display rule elsewhere: the rows, the group panels and the
+     per-filter empty notes. */
+  :global([data-kind][hidden], [data-group][hidden], [data-empty][hidden]) {
+    display: none !important;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    function init(control) {
+      control.setAttribute("data-ready", "");
+
+      var mode = control.getAttribute("data-mode");
+      var targetId = control.getAttribute("data-target");
+      var container = document.getElementById(targetId);
+      var link = document.querySelector('[data-filter-link="' + CSS.escape(targetId) + '"]');
+      var buttons = control.querySelectorAll("button[data-filter]");
+
+      function apply(filter) {
+        buttons.forEach(function (button) {
+          button.setAttribute(
+            "aria-pressed",
+            button.getAttribute("data-filter") === filter ? "true" : "false"
+          );
+        });
+
+        if (container) {
+          if (mode === "groups") {
+            container.querySelectorAll("[data-group]").forEach(function (panel) {
+              panel.hidden = panel.getAttribute("data-group") !== filter;
+            });
+          } else {
+            var shown = 0;
+            container.querySelectorAll("[data-kind]").forEach(function (item) {
+              var hide = filter !== "all" && item.getAttribute("data-kind") !== filter;
+              item.hidden = hide;
+              if (!hide) shown += 1;
+            });
+            container.querySelectorAll("[data-empty]").forEach(function (note) {
+              note.hidden = shown > 0 || note.getAttribute("data-empty") !== filter;
+            });
+          }
+        }
+
+        if (link) {
+          link.setAttribute("href", filter === "all" ? "/blog" : "/blog?kind=" + filter);
+        }
+      }
+
+      buttons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          apply(button.getAttribute("data-filter"));
+        });
+      });
+
+      var kind = new URLSearchParams(location.search).get("kind");
+      apply(kind === "blog" || kind === "newsletter" ? kind : "all");
+    }
+
+    function initAll() {
+      document.querySelectorAll(".writing-filter:not([data-ready])").forEach(init);
+    }
+
+    // The controlled container and the "All posts" link come after this
+    // control in the DOM, so wait until the document is parsed.
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initAll);
+    } else {
+      initAll();
+    }
+  })();
+</script>

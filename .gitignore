@@ -1,0 +1,17 @@
+node_modules/
+.pnpm-store/
+dist/
+.astro/
+public/media/
+.env
+.DS_Store
+.claude/local.md
+
+# Lavish review artifacts
+.lavish/
+
+# Git worktrees
+.worktrees/
+
+# pnpm local store
+.pnpm-store/

@@ -1,0 +1,91 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const tagline = "What can AI take off your plate? A newsletter for people who want to know what AI can actually do for them.";
+---
+
+<BaseLayout title="Newsletter — Ryan Lynch" description={tagline}>
+  <article class="page-content">
+    <header class="page-header">
+      <h1>Your Turn, Robot</h1>
+      <p class="page-tagline">{tagline}</p>
+    </header>
+    <div class="content">
+      <p>
+        Each issue of <em>Your Turn, Robot</em> is the AI section of my
+        notes, cleaned up. Tools I've started using, write-ups that
+        changed how I think. All stuff I've personally gotten real
+        value from.
+      </p>
+      <p>AI I know works, because I've used it.</p>
+      <p>Ships Tuesday mornings.</p>
+      <p class="subscribe-note">
+        Subscribe below to get it in your inbox &mdash; or
+        <a href="/blog?kind=newsletter">read past issues</a>.
+      </p>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .page-content {
+    padding-top: 1.5rem;
+  }
+
+  .page-header {
+    margin-bottom: 1.25rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .page-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+    padding-bottom: 0.6rem;
+    position: relative;
+    display: inline-block;
+  }
+
+  .page-header h1::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 3rem;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--color-accent-warm);
+  }
+
+  .page-tagline {
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-top: 0.1rem;
+    margin-bottom: 0;
+  }
+
+  .content p {
+    margin-bottom: 1rem;
+    line-height: 1.75;
+    color: var(--color-text-secondary);
+  }
+
+  .subscribe-note {
+    margin-top: 1.5rem;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+  }
+
+  .subscribe-note a {
+    color: var(--color-accent);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .subscribe-note a:hover {
+    color: var(--color-accent-hover);
+  }
+</style>

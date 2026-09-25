@@ -1,0 +1,97 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PostCard from "../../components/PostCard.astro";
+import WritingFilter from "../../components/WritingFilter.astro";
+import { getWriting } from "../../lib/writing";
+import { EMPTY_MESSAGES } from "../../lib/empty-messages.mjs";
+
+const items = await getWriting();
+---
+
+<BaseLayout title="Blog — Ryan Lynch" description="Technical blog posts about software engineering, AI, and building things.">
+  <section class="blog-page">
+    <header class="page-header">
+      <div class="page-intro">
+        <h1>Blog</h1>
+        <p>Writing about software engineering, AI, home automation, and whatever else I'm thinking about.</p>
+      </div>
+      <WritingFilter mode="rows" target="writing-list" />
+    </header>
+    <div class="post-list" id="writing-list">
+      {items.map((item) => (
+        <PostCard
+          title={item.title}
+          href={item.href}
+          kind={item.kind}
+          external={item.external}
+          date={item.date}
+          description={item.description}
+          tags={item.tags}
+        />
+      ))}
+      {/* Empty states, one per filter. The "all" note covers a site with
+          nothing published; the per-kind notes are shown by WritingFilter
+          when its filter leaves no card visible, because the filtering
+          happens in the browser. The live region holds only these notes:
+          around the list it would announce every card on every click. */}
+      <div aria-live="polite">
+        {Object.entries(EMPTY_MESSAGES).map(([kind, message]) => (
+          <p class="empty-note" data-empty={kind} hidden={kind !== "all" || items.length > 0}>{message}</p>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .blog-page {
+    padding-top: 1.5rem;
+  }
+
+  /* Two rows, each holding one item: the title and blurb, then the filter.
+     gap is the row gap between them. */
+  .page-header {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  /* The title and blurb take the whole first line, so the filter gets a
+     row of its own under the blurb at every width, flush left with the
+     title (Ryan's choice, 2026-09-19, matching the approved mockup). The
+     blurb keeps its natural one-line width on a desktop; it is never
+     squeezed to make room for the filter. */
+  .page-intro {
+    flex-basis: 100%;
+  }
+
+  .page-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.35rem;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 0.6rem;
+  }
+
+  .page-header h1::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 3rem;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--color-accent-warm);
+  }
+
+  .page-header p {
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+</style>

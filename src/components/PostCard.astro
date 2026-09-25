@@ -1,0 +1,94 @@
+---
+// One entry in the /blog list: a blog post or a newsletter issue.
+
+import type { WritingKind } from "../lib/writing";
+import { formatDay, isoDay } from "../lib/dates.mjs";
+import ExternalMark from "./ExternalMark.astro";
+import Tag from "./Tag.astro";
+
+interface Props {
+  title: string;
+  href: string;
+  kind: WritingKind;
+  external?: boolean;
+  date?: Date;
+  description?: string;
+  tags?: string[];
+}
+
+const { title, href, kind, external = false, date, description, tags = [] } = Astro.props;
+const linkAttrs = external ? { target: "_blank", rel: "noopener" } : {};
+---
+
+<article class="post-card" data-kind={kind}>
+  <div class="post-card-header">
+    <a href={href} class="post-card-title" {...linkAttrs}>{title}{external && <ExternalMark />}</a>
+    {date && (
+      <time datetime={isoDay(date)}>{formatDay(date, "medium")}</time>
+    )}
+  </div>
+  {description && <p class="post-card-desc">{description}</p>}
+  {(kind === "newsletter" || tags.length > 0) && (
+    <div class="post-card-tags">
+      {kind === "newsletter" && <Tag variant="kind">newsletter</Tag>}
+      {tags.map((tag: string) => (
+        <Tag variant="topic">{tag}</Tag>
+      ))}
+    </div>
+  )}
+</article>
+
+<style>
+  .post-card {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .post-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+  }
+
+  .post-card-title {
+    font-weight: 500;
+    font-size: 1.05rem;
+    text-decoration: none;
+    color: var(--color-text);
+    transition: color 0.15s ease;
+  }
+
+  .post-card-title:hover {
+    color: var(--color-accent);
+  }
+
+  /* The text is flush with the link's edges; keep the focus ring off it,
+     as on the home page. */
+  .post-card-title:focus-visible {
+    outline-offset: 4px;
+  }
+
+  time {
+    color: var(--color-muted);
+    font-size: 0.85rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .post-card-desc {
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-top: 0.25rem;
+  }
+
+  /* Tags keep Tag's default size here, and a tag wider than the card breaks
+     at its hyphens, which is Tag's default too. */
+  .post-card-tags {
+    display: flex;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+</style>

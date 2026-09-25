@@ -1,0 +1,231 @@
+---
+// One pre-rendered "Recent Writing" panel: a featured card plus compact rows.
+// The home page renders three of these (all / blog / newsletter) and
+// WritingFilter toggles which one is visible.
+
+import type { WritingItem } from "../lib/writing";
+import { formatDay, isoDay } from "../lib/dates.mjs";
+import ExternalMark from "./ExternalMark.astro";
+import Tag from "./Tag.astro";
+import { EMPTY_MESSAGES } from "../lib/empty-messages.mjs";
+
+interface Props {
+  group: "all" | "blog" | "newsletter";
+  items: WritingItem[];
+  hidden?: boolean;
+}
+
+const { group, items, hidden = false } = Astro.props;
+const [featured, ...rows] = items;
+
+const emptyMessage = EMPTY_MESSAGES[group];
+
+const linkAttrs = (item: WritingItem) =>
+  item.external ? { target: "_blank", rel: "noopener" } : {};
+
+// A row title is inline text followed by one unbreakable group (kind tag,
+// then ExternalMark). The row markup puts line breaks only inside {}
+// expressions, because any whitespace between the title and the group, or
+// inside the group, would add a space before the tag or the arrow.
+const hasMarks = (item: WritingItem) => item.kind === "newsletter" || item.external;
+
+// The featured link is named by its title and described by its date line and
+// description, so screen readers do not read the whole card as its name. The
+// same item can render in two panels, so the ids carry the group.
+const featuredIds = {
+  title: `${group}-featured-title`,
+  meta: `${group}-featured-meta`,
+  description: `${group}-featured-description`,
+  newTab: `${group}-featured-new-tab`,
+};
+const featuredLabelledBy = featured?.external
+  ? `${featuredIds.title} ${featuredIds.newTab}`
+  : featuredIds.title;
+const featuredDescribedBy = featured?.description
+  ? `${featuredIds.meta} ${featuredIds.description}`
+  : featuredIds.meta;
+---
+
+<div data-group={group} hidden={hidden}>
+  {featured ? (
+    <a
+      href={featured.href}
+      class="featured"
+      aria-labelledby={featuredLabelledBy}
+      aria-describedby={featuredDescribedBy}
+      {...linkAttrs(featured)}
+    >
+      <div class="featured-meta" id={featuredIds.meta}>
+        <time datetime={isoDay(featured.date)}>{formatDay(featured.date, "medium")}</time>
+        {featured.kind === "newsletter" && <Tag variant="kind">newsletter</Tag>}
+        {featured.tags.length > 0 && (
+          <span class="featured-tags">
+            {featured.tags.map((tag) => (
+              <Tag variant="topic">{tag}</Tag>
+            ))}
+          </span>
+        )}
+      </div>
+      <h3 id={featuredIds.title}>{featured.title}{featured.external && <ExternalMark only="mark" />}</h3>
+      {featured.description && <p id={featuredIds.description}>{featured.description}</p>}
+      {/* After the description, not in the heading: heading navigation reads
+          just the title. aria-labelledby adds it to the link's name. */}
+      {featured.external && <ExternalMark only="hint" hintId={featuredIds.newTab} />}
+    </a>
+  ) : (
+    <p class="empty-note">{emptyMessage}</p>
+  )}
+
+  <div class="post-list">
+    {rows.map((item) => (
+      <a href={item.href} class="post-row" {...linkAttrs(item)}>
+        <span class="post-title">
+          {item.title}{hasMarks(item) && <span class="marks-gap">{" "}</span>}{hasMarks(item) && (
+            <span class="marks">{item.kind === "newsletter" && (
+              <Tag variant="kind">newsletter</Tag>
+            )}{item.external && <ExternalMark />}</span>
+          )}
+        </span>
+        <time datetime={isoDay(item.date)}>{formatDay(item.date, "short")}</time>
+      </a>
+    ))}
+  </div>
+</div>
+
+<style>
+  /* The home page's tags are a step smaller than Tag's defaults, which are
+     the post page's and the blog list's size. Set once for the whole group:
+     custom properties inherit across Astro's style scopes. */
+  [data-group] {
+    --tag-font-size: 0.7rem;
+    --tag-pad-x: 0.4rem;
+  }
+
+  /* ===== Featured card ===== */
+  .featured {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    padding: 1.25rem 0 1.25rem 1.25rem;
+    border-left: 3px solid var(--color-accent-warm);
+    margin: 1.25rem 0;
+    transition: border-color 0.2s ease;
+  }
+
+  .featured:hover {
+    border-color: var(--color-accent);
+  }
+
+  /* The text is flush with the link's edges; keep the focus ring off it. */
+  .featured:focus-visible,
+  .post-row:focus-visible {
+    outline-offset: 4px;
+  }
+
+  .featured-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.35rem;
+    flex-wrap: wrap;
+  }
+
+  .featured-meta time {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+  }
+
+  /* min-width: 0 lets this flex item shrink below its widest tag, so a tag
+     wider than the card can be cut instead of widening the page. */
+  .featured-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  /* A single tag wider than the card is cut with an ellipsis. Only here:
+     overflow other than visible moves an inline-block's baseline, which
+     would break a row tag's alignment with its title. :global because the
+     span belongs to Tag's style scope. */
+  .featured-tags :global(.tag) {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .featured h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1.35;
+    transition: color 0.15s ease;
+  }
+
+  .featured:hover h3 {
+    color: var(--color-accent);
+  }
+
+  /* The gap under the title belongs to the description, so a card without
+     one has the same 1.25rem below the title as above the date. (A margin
+     on the h3 removed by :last-child would miss newsletter cards, where the
+     hidden new-tab text follows the h3.) */
+  .featured p {
+    margin-top: 0.3rem;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--color-text-secondary);
+  }
+
+  /* ===== Compact rows ===== */
+  .post-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .post-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--color-border);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .post-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: color 0.15s ease;
+  }
+
+  /* The one break point before the group, 0.45rem wide. A space in a
+     monospace font is 1ch, so word-spacing tops it up to the exact width.
+     Like any space it is dropped at the end of a line, so a group that
+     wraps starts flush with the title. */
+  .marks-gap {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    word-spacing: calc(0.45rem - 1ch);
+  }
+
+  /* Tag, arrow and hidden text follow the last word or wrap together.
+     --ext-gap reaches ExternalMark's scoped .ext because custom properties
+     inherit; a scoped ".marks .ext" rule here would not match it. */
+  .marks {
+    white-space: nowrap;
+    --ext-gap: 0.45rem;
+  }
+
+  .post-row:hover .post-title {
+    color: var(--color-accent);
+  }
+
+  .post-row time {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+</style>

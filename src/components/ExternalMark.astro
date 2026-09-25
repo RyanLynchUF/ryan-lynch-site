@@ -1,0 +1,43 @@
+---
+// ExternalMark: the "↗" after the title of a link that opens in a new tab,
+// plus visually hidden "(opens in a new tab)" text, because the arrow itself
+// is aria-hidden.
+//
+// Call it directly after the title with no whitespace in between:
+//
+//   {title}<ExternalMark />
+//
+// A space before it would add to the margin, and the arrow could then wrap
+// onto a line by itself.
+//
+// A caller that needs the two parts in different places renders them
+// separately: only="mark" is just the arrow, only="hint" just the hidden
+// text, and hintId gives the hidden text an id for aria-labelledby. The
+// featured card on the home page keeps the hint out of its heading this way.
+// only="hint" requires a hintId, and hintId is accepted only with it.
+//
+// The gap before the arrow is --ext-gap (default 0.3rem), set on any
+// ancestor. Custom properties inherit across Astro's style scopes; a scoped
+// rule in the caller would not reach this component's span.
+//
+// The <style> block comes before the markup on purpose: Astro emits the
+// whitespace between a component's markup and a following <style> as a
+// space after the component, which a caller's layout does not expect.
+
+// A union, so astro check rejects a missing or misplaced hintId.
+type Props = { only?: undefined } | { only: "mark" } | { only: "hint"; hintId: string };
+
+const props = Astro.props;
+const only = props.only;
+const hintId = props.only === "hint" ? props.hintId : undefined;
+---
+
+<style>
+  .ext {
+    margin-left: var(--ext-gap, 0.3rem);
+    font-size: 0.75em;
+    color: var(--color-muted);
+  }
+</style>
+
+{only !== "hint" && <span class="ext" aria-hidden="true">↗</span>}{only !== "mark" && <span id={hintId} class="visually-hidden"> (opens in a new tab)</span>}

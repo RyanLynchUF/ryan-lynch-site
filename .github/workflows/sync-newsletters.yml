@@ -1,0 +1,69 @@
+name: Sync newsletters
+
+on:
+  schedule:
+    # Wednesday 13:00 UTC, the morning after a Tuesday send.
+    - cron: "0 13 * * 3"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: sync-newsletters
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Fetch sent issues from beehiiv
+        env:
+          BEEHIIV_API_KEY: ${{ secrets.BEEHIIV_API_KEY }}
+          BEEHIIV_PUBLICATION_ID: ${{ secrets.BEEHIIV_PUBLICATION_ID }}
+        run: pnpm run sync:newsletters
+
+      - name: Detect changes
+        id: diff
+        run: |
+          if [ -n "$(git status --porcelain -- src/data/newsletters.json)" ]; then
+            git status --short -- src/data/newsletters.json
+            git diff --stat -- src/data/newsletters.json
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "no change"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push snapshot
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/newsletters.json
+          git commit -m "Sync newsletters from beehiiv"
+          git log -1 --oneline
+          git push origin HEAD:main
+
+      # A push made with GITHUB_TOKEN does not trigger `on: push` workflows.
+      # workflow_dispatch via GITHUB_TOKEN is the documented exception and
+      # needs `actions: write`.
+      - name: Trigger site build
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main

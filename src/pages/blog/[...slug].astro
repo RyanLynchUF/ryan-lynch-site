@@ -1,0 +1,180 @@
+---
+import type { InferGetStaticPropsType } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Tag from "../../components/Tag.astro";
+import { render } from "astro:content";
+import { getPublishedPosts } from "../../lib/posts";
+import { formatDay, isoDay, toCalendarDay } from "../../lib/dates.mjs";
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  return posts.map((post) => ({
+    params: { slug: post.data.slug },
+    props: { post },
+  }));
+}
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+// A YAML calendar day is UTC midnight; toCalendarDay drops any time of day.
+const day = toCalendarDay(post.data.date, "UTC");
+---
+
+<BaseLayout title={`${post.data.title} — Ryan Lynch`} description={post.data.description}>
+  <article class="blog-post">
+    <a href="/blog" class="back-link">&larr; All posts</a>
+    <header class="post-header">
+      <h1>{post.data.title}</h1>
+      <div class="post-meta">
+        <time datetime={isoDay(day)}>{formatDay(day, "long")}</time>
+        {post.data.tags.length > 0 && (
+          <div class="tags">
+            {post.data.tags.map((tag: string) => (
+              <Tag variant="topic">{tag}</Tag>
+            ))}
+          </div>
+        )}
+      </div>
+    </header>
+    <div class="post-content">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>
+
+<script>
+  document.addEventListener('astro:page-load', setup);
+  setup();
+
+  function setup() {
+    if (document.getElementById('lightbox-overlay')) return;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'lightbox-overlay';
+    const img = document.createElement('img');
+    overlay.appendChild(img);
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === img) return;
+      overlay.classList.remove('active');
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') overlay.classList.remove('active');
+    });
+
+    document.querySelectorAll<HTMLImageElement>('.post-content img').forEach((postImg) => {
+      postImg.style.cursor = 'zoom-in';
+      postImg.addEventListener('click', () => {
+        img.src = postImg.src;
+        img.alt = postImg.alt;
+        overlay.classList.add('active');
+      });
+    });
+  }
+</script>
+
+<style is:global>
+  #lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    cursor: zoom-out;
+  }
+
+  #lightbox-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  #lightbox-overlay img {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 6px;
+    cursor: default;
+  }
+</style>
+
+<style>
+  .blog-post {
+    padding-top: 1.5rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    text-decoration: none;
+    margin-bottom: 1.5rem;
+    transition: color 0.15s ease;
+  }
+
+  .back-link:hover {
+    color: var(--color-accent);
+  }
+
+  .post-header {
+    margin-bottom: 1.25rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .post-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    position: relative;
+  }
+
+  .post-header h1::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 3rem;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--color-accent-warm);
+  }
+
+  /* Spacing alone separates the date from the tags, at every width, as on
+     the home page's featured card (HomeWritingGroup's .featured-meta).
+     Ryan's decision, 2026-09-19: a "middot" separator dangled at the end
+     of the date's line whenever the tags wrapped, which depended on the
+     width and on how many tags a post has. The gap is .featured-meta's
+     0.75rem, and it is also the row gap once the tags wrap. */
+  .post-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .post-meta time {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+
+  /* Tags keep Tag's default size here, and this page lists a post's tags in
+     full, so one wider than the page breaks at its hyphens, which is Tag's
+     default too. */
+  .tags {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+</style>

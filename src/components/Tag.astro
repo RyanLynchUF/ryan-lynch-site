@@ -1,0 +1,55 @@
+---
+// Tag: a small monospace label. variant "topic" (filled) is a post's topic
+// tag; variant "kind" (outlined) marks the kind of item, such as a newsletter
+// issue.
+//
+// Size comes from two custom properties, set on any ancestor:
+// --tag-font-size (default 0.75rem) and --tag-pad-x (default 0.45rem).
+// Those defaults are the post page's and the blog list's size; the home
+// page's compact rows and cards set the smaller pair once, on the group.
+// Custom properties inherit across Astro's style scopes; a scoped rule in
+// the caller would not reach this component's span.
+//
+// A topic tag wraps like any text, which on the post page and the blog list
+// lets one wider than the column break at its hyphens. A caller that needs
+// it on one line says so: the home rows' .marks group is nowrap, and the
+// featured card sets nowrap to cut a too-wide tag with an ellipsis.
+//
+// A kind tag never wraps. Its labels are a fixed vocabulary written in code,
+// so one broken across two lines would be a bug, not long content.
+//
+// The <style> block comes before the markup on purpose: Astro emits the
+// whitespace between a component's markup and a following <style> as a
+// space, which would land between a tag and a following ExternalMark.
+
+interface Props {
+  variant: "topic" | "kind";
+}
+
+const { variant } = Astro.props;
+---
+
+<style>
+  /* inline-block so a tag inside a line of text keeps the same box as a tag
+     in a flex container, and sits on the text's baseline. */
+  .tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: var(--tag-font-size, 0.75rem);
+    padding: 0.1rem var(--tag-pad-x, 0.45rem);
+    border-radius: 3px;
+    background: var(--color-tag-bg);
+    color: var(--color-tag-text);
+  }
+
+  /* Outlined. The padding gives back the border's 1px so a kind tag is the
+     same size as a topic tag. */
+  .tag.kind {
+    background: transparent;
+    border: 1px solid var(--color-tag-text);
+    white-space: nowrap;
+    padding: calc(0.1rem - 1px) calc(var(--tag-pad-x, 0.45rem) - 1px);
+  }
+</style>
+
+<span class:list={["tag", { kind: variant === "kind" }]}><slot /></span>
